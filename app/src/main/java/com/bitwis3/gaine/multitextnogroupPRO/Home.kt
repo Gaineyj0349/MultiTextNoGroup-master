@@ -16,7 +16,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
-import com.bitwis3.gaine.multitextnogroupPRO.R.id.toolbar
 import com.google.ads.consent.ConsentForm
 import io.supercharge.shimmerlayout.ShimmerLayout
 import kotlinx.android.synthetic.main.activity_home.*
@@ -45,6 +44,7 @@ class Home : AppCompatActivity() {
     lateinit var shimmerText3: ShimmerLayout
     lateinit var shimmerText5: ShimmerLayout
     lateinit var shimmerText4: ShimmerLayout
+    lateinit var shimmerText6: ShimmerLayout
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,8 +79,18 @@ class Home : AppCompatActivity() {
         // as you specify a parent activity in AndroidManifest.xml.
         val id = item.itemId
 
+        if (id == R.id.EMERGENCY) {
+            startActivity(Intent(this, Emergency::class.java))
+            return true
+        }
+
         if (id == R.id.test2) {
             startActivity(Intent(this, Credits::class.java))
+            Bungee.card(this)
+            return true
+        }
+        if (id == R.id.importexport) {
+            startActivity(Intent(this, ImportExport2::class.java))
             Bungee.card(this)
             return true
         }
@@ -133,6 +143,7 @@ class Home : AppCompatActivity() {
             R.id.card3info ->{initNewBuilder(resources.getString(R.string.card3info))}
             R.id.card4info ->{initNewBuilder(resources.getString(R.string.card4info))}
             R.id.card5info ->{initNewBuilder(resources.getString(R.string.card5info))}
+            R.id.card6info ->{initNewBuilder(resources.getString(R.string.card6info))}
         }
     }
 
@@ -171,6 +182,7 @@ class Home : AppCompatActivity() {
         card3info.visibility = View.VISIBLE
         card4info.visibility = View.VISIBLE
         card5info.visibility = View.VISIBLE
+        card6info.visibility = View.VISIBLE
     }
     fun hideInfos(){
         card1info.visibility = View.GONE
@@ -178,6 +190,7 @@ class Home : AppCompatActivity() {
         card3info.visibility = View.GONE
         card4info.visibility = View.GONE
         card5info.visibility = View.GONE
+        card6info.visibility = View.GONE
     }
 
 fun goToGroupManage(v: View){
@@ -192,6 +205,12 @@ fun goToGroupManage(v: View){
         Bungee.slideLeft(this)
     }
 
+    fun goToEmergency(v: View){
+        val intent = Intent(this@Home, Emergency::class.java)
+        startActivity(intent)
+        Bungee.slideLeft(this)
+
+    }
     fun goToMainAct(v: View){
         val intent = Intent(this@Home, MainActivity::class.java)
         startActivity(intent)
@@ -211,6 +230,7 @@ fun initTheAnims(){
     shimmerText3 = findViewById(R.id.shimmer_text_card3) as ShimmerLayout
     shimmerText4 = findViewById(R.id.shimmer_text_card4) as ShimmerLayout
 
+    shimmerText6 = findViewById(R.id.shimmer_text_card6) as ShimmerLayout
 
     }
 
@@ -222,6 +242,7 @@ fun initTheAnims(){
         shimmerText1.startShimmerAnimation()
         shimmerText3.startShimmerAnimation()
         shimmerText4.startShimmerAnimation()
+        shimmerText6.startShimmerAnimation()
     }
 
     fun stopAnims(){
@@ -230,6 +251,7 @@ fun initTheAnims(){
         shimmerText1.stopShimmerAnimation()
         shimmerText3.stopShimmerAnimation()
         shimmerText4.stopShimmerAnimation()
+        shimmerText6.stopShimmerAnimation()
     }
 
 

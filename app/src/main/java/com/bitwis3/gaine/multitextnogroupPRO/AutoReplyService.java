@@ -57,7 +57,9 @@ public class AutoReplyService extends Service {
     private Notification getNotificationforAuto(){
         RemoteViews contentView = new RemoteViews("com.bitwis3.gaine.multitextnogroupPRO", R.layout.custom_notification);
         contentView.setImageViewResource(R.id.image, R.mipmap.icon);
-        contentView.setTextViewText(R.id.notificationtext, "Auto Text Mode is ON - tap to change.");
+
+                contentView.setTextViewText(R.id.notificationtext, "Auto Text AND/OR \nWake-Up is ON - tap to change.");
+
 
         Notification.Builder builder =
                 new Notification.Builder(this);
@@ -79,7 +81,10 @@ public class AutoReplyService extends Service {
 
         builder.setContentIntent(pendingIntent);
         builder.setContent(contentView);
-        builder.setContentTitle("Auto Text Mode is ON - tap to change.");
+
+                builder.setContentTitle("Auto Text AND/OR \nWake-Up - tap to change.");;
+
+
         builder.setAutoCancel(true);
         builder.setPriority(Notification.PRIORITY_MAX);
         builder.setDefaults(Notification.DEFAULT_VIBRATE);

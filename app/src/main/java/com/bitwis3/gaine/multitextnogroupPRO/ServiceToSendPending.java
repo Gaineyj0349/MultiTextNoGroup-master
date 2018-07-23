@@ -10,6 +10,7 @@ import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -24,7 +25,8 @@ import spencerstudios.com.fab_toast.FabToast;
 public class ServiceToSendPending extends Service {
 
     com.bitwis3.gaine.multitextnogroupPRO.DBRoom db;
-
+    Handler handler;
+    SmsManager smsManager;
 
 
     public ServiceToSendPending() {
@@ -49,7 +51,8 @@ public class ServiceToSendPending extends Service {
 
 
         startForeground(1, getNotificationforService());
-
+        handler = new Handler();
+        smsManager = SmsManager.getDefault();
         Log.i("JOSHser", "onstartcommand has been started!!");
 
 
@@ -61,7 +64,7 @@ public class ServiceToSendPending extends Service {
             sendMessages(pendingTextsList);
         }else if(intent.hasExtra("fromboot")){
 
-            if(checkForOldMessages()){
+            if(checkForOldAndMissedMessages()){
                 showNotificationForOld();
             }
 
@@ -92,6 +95,32 @@ public class ServiceToSendPending extends Service {
 
 
             return START_NOT_STICKY;
+    }
+
+    private void sendMessage(final int i, final List<Contact> pendingTextsList){
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Log.i("JOSHser", "iteration happened sending to" + pendingTextsList.get(i).getNumber());
+                if(pendingTextsList.get(i).getNumber() != null) {
+                if (pendingTextsList.get(i).getMessage().length() > 155) {
+                    ArrayList<String> parts = smsManager.divideMessage(pendingTextsList.get(i).getMessage());
+                    smsManager.sendMultipartTextMessage(pendingTextsList.get(i).getNumber(), null,
+                            parts, null, null);
+                } else {
+                    smsManager.sendTextMessage(pendingTextsList.get(i).getNumber(), null,
+                            pendingTextsList.get(i).getMessage(), null, null);
+                }
+                db.multiDOA().updateTypeEntryWithID(pendingTextsList.get(i).getId(), "timed_text_sent");
+
+                if (i < pendingTextsList.size() - 1) {
+                    sendMessage(i + 1, pendingTextsList);
+                }
+            }else{
+                    return;
+                }
+            }
+        },100);
     }
 
     private void showNotificationForOld() {
@@ -159,40 +188,42 @@ public class ServiceToSendPending extends Service {
         notificationMgr.notify(latestCode, notification);
     }
 
-    private boolean checkForOldMessages() {
+    private boolean checkForOldAndMissedMessages() {
         boolean check = false;
-        List<com.bitwis3.gaine.multitextnogroupPRO.Contact> oldMessages = db.multiDOA().getAllMissed(System.currentTimeMillis());
+        List<Contact> oldMessages = db.multiDOA().getAllMissed(System.currentTimeMillis());
+        List<Contact> missedMessages = db.multiDOA().getAllUnsentForService();
+        oldMessages.addAll(missedMessages);
         if(oldMessages.size()>0){
             check = true;
+
+            for(Contact c : oldMessages){
+                db.multiDOA().updateTypeEntryWithID(c.getId(), "missed");
+            }
         }
         return check;
     }
 
 
-    private void sendMessages(List<com.bitwis3.gaine.multitextnogroupPRO.Contact> pendingTextsList) {
+    private void sendMessages(List<Contact> pendingTextsList) {
 
+        try{
+            if(Seed.isTelephonyMobileConnected(this)) {
+                Log.i("JOSHser", "size:"+ pendingTextsList.size());
+                sendMessage(0, pendingTextsList);
 
-        SmsManager smsManager = SmsManager.getDefault();
-try{
-
-        for(com.bitwis3.gaine.multitextnogroupPRO.Contact c : pendingTextsList){
-            Log.i("JOSHser", "iteration happened sending to" + c.getNumber());
-            if(c.getMessage().length() > 155){
-                ArrayList<String> parts = smsManager.divideMessage(c.getMessage());
-                smsManager.sendMultipartTextMessage(c.getNumber(), null,
-                        parts, null, null);
-            }else{
-                smsManager.sendTextMessage(c.getNumber(), null,
-                        c.getMessage(), null, null);
+                getNotification();
             }
-                db.multiDOA().updateTypeEntryWithID(c.getId(), "timed_text_sent");
+            else{
+                for (Contact c : pendingTextsList) {
+                    db.multiDOA().updateTypeEntryWithID(c.getId(), "missed");
+                }
+                showNotificationForOld();
+            }
+        }catch (Exception e){
+            FabToast.makeText(this, "We do apologize, but your device is not supported currently.", Toast.LENGTH_LONG, FabToast.ERROR, FabToast.POSITION_DEFAULT).show();
+
         }
-}catch (Exception e){
-    FabToast.makeText(this, "We do apologize, but your device is not supported currently.", Toast.LENGTH_LONG, FabToast.ERROR, FabToast.POSITION_DEFAULT).show();
 
-}
-
-        getNotification();
         stopForeground(true);
         stopSelf();
         onDestroy();
@@ -310,5 +341,7 @@ try{
 
         return notification;
     }
+
+
 
 }

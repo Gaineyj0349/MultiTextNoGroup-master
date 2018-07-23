@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.TextView
@@ -64,6 +65,7 @@ class ActivityLog : AppCompatActivity() {
         }
     }
 
+
     override fun onResume() {
         super.onResume()
         when (tabLayoutLog.selectedTabPosition){
@@ -72,6 +74,12 @@ class ActivityLog : AppCompatActivity() {
             2 -> {initMissed()}
         }
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu_emergency, menu)
+        return true
     }
 
 
@@ -84,6 +92,11 @@ class ActivityLog : AppCompatActivity() {
                 Bungee.slideRight(this)
                 this.finish()
 
+                return true
+            }
+            R.id.emergencytoolbar-> {
+                startActivity(Intent(this, Emergency::class.java))
+                this.finish()
                 return true
             }
         }
@@ -150,7 +163,7 @@ class ActivityLog : AppCompatActivity() {
     }
     fun initMissed(){
         Log.i("JOSHlog", "missedlicked")
-        var allRecordsOfMessages = db.multiDOA().getAllMissed(System.currentTimeMillis())
+        var allRecordsOfMessages = db.multiDOA().allLogTabMissed
         if(allRecordsOfMessages.size  == 0){
             supportActionBar?.title = "No Unsent Texts"
         }else{

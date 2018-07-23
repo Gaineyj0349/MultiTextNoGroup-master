@@ -6,13 +6,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ImageView;
@@ -31,20 +31,26 @@ public class splash extends AppCompatActivity implements Animation.AnimationList
     AlphaAnimation alphaAnimation2;
     ImageView imageView;
     AlphaAnimation alphaAnimation;
-    SQLiteToRoomConverter dbConverter;
     Intent intent = null;
     String[] p;
+    int i = 0;
+    int j = 0;
+    boolean startAvail = true;
+    Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-      requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags((WindowManager.LayoutParams.FLAG_FULLSCREEN), WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash);
-       getSupportActionBar().hide();
+
+        if(rapidOn()){
+            startActivity(new Intent(this, Emergency.class));
+            finish();
+        }
 
 
-         dbConverter = new SQLiteToRoomConverter(splash.this);
+          handler = new Handler();
+
          initIntent();
 
           p = new String[4];
@@ -91,11 +97,39 @@ public class splash extends AppCompatActivity implements Animation.AnimationList
 
 
     }
-
+    boolean reset = false;
     public void startAll(){
 
 
         imageView = (ImageView)findViewById(R.id.image);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        reset = false;
+                        i=0;
+                        Log.i("JOSHlogo", "h");
+
+                    }
+                }, 500);
+                ++i;
+                ++j;
+                if(j>1 && !reset){
+                    FabToast.makeText(splash.this, "TAP LOGO TWICE QUICKLY FOR EMERGENCY AREA!", FabToast.LENGTH_LONG,
+                            FabToast.INFORMATION, FabToast.POSITION_TOP).show();
+                }
+                if(i>1 && reset){
+                    startAvail = false;
+                    startActivity(new Intent(splash.this,Emergency.class));
+                    finish();
+                }
+                Log.i("JOSHlogo", "j = " + j + " reset = " + reset);
+                reset = true;
+            }
+        });
         alphaAnimation= new AlphaAnimation(0f, 1f);
         alphaAnimation.setDuration(1500);
         alphaAnimation.setAnimationListener(splash.this);
@@ -121,9 +155,11 @@ public class splash extends AppCompatActivity implements Animation.AnimationList
         }
         if(animation.equals(alphaAnimation2)){
             imageView.setVisibility(View.GONE);
+                if(startAvail){
+                    startActivity(intent);
+                    Bungee.fade(splash.this);
+                }
 
-                startActivity(intent);
-                Bungee.slideUp(splash.this);
 
 
 
@@ -140,12 +176,8 @@ public class splash extends AppCompatActivity implements Animation.AnimationList
 
     public void initIntent(){
 
-        if(dbConverter.dbExists("_contactDB")){
-            intent = new Intent(splash.this,DBtransition.class);
-        }
-        else{
             intent = new Intent(splash.this,Home.class);
-        }
+
 
     }
 
@@ -188,11 +220,16 @@ public class splash extends AppCompatActivity implements Animation.AnimationList
             if (ContextCompat.checkSelfPermission(splash.this, permission[i]) != PackageManager.PERMISSION_GRANTED) {
               show = false;
             }
+
         }
         return show;
     }
+    private boolean rapidOn() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getBoolean("rapid", false);
+    }
 
-    Seed.CrashHandler crashHandler = new Seed.CrashHandler(new HandlingClass());
+    Seed.CrashHandler crashHandler = new Seed.CrashHandler(new HandlingClass(), this);
     class HandlingClass implements Seed.CrashHandler.CrashHandlingInterface{
 
         @Override
@@ -200,8 +237,11 @@ public class splash extends AppCompatActivity implements Animation.AnimationList
             Log.i("JOSHCRASH", "SUCCESSFULLY CAUGHT BROTHA");
             SharedPreferences.Editor editor = getSharedPreferences("AUTO_PREF", Context.MODE_PRIVATE).edit();
             editor.putString("message","");
+            editor.putString("break_thru_mode_on_off", "off");
             editor.putString("auto_reply_mode_on_off", "off");
             editor.apply();
         }
     }
+
+
 }

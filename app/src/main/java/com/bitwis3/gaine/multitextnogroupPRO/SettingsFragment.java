@@ -81,6 +81,19 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 } else {
                     connectionPref.setSummary("Disabled");
                 }
-            }}
+            }
+            else if (key.equals("rapid")) {
+
+                Preference connectionPref = findPreference(key);
+                boolean test = sharedPreferences.getBoolean("rapid", false);
+                //Do whatever you want here. This is an example.
+                if (test) {
+                    connectionPref.setSummary("Enabled");
+                } else {
+                    connectionPref.setSummary("Disabled");
+                }
+            }
+
+        }
     }
 }

@@ -1,11 +1,17 @@
 package com.bitwis3.gaine.multitextnogroupPRO;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
+import spencerstudios.com.bungeelib.Bungee;
 import spencerstudios.com.fab_toast.FabToast;
 
 public class Credits extends AppCompatActivity {
@@ -18,7 +24,11 @@ public class Credits extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_javatest);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        SharedPreferences prefs =getSharedPreferences("AUTO_PREF", Context.MODE_PRIVATE);
+        Log.i("JOSHERRORt", prefs.getString("CRASH", "hello"));
     }
+
+
 
     public void MIT(View V) {
 
@@ -48,6 +58,35 @@ public class Credits extends AppCompatActivity {
             FabToast.makeText(this, "There was an error opening, please try with internet",
                     FabToast.LENGTH_LONG, FabToast.ERROR, FabToast.POSITION_DEFAULT).show();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_emergency, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+
+                Bungee.slideRight(this);
+                this.finish();
+
+                return true;
+
+
+            case R.id.emergencytoolbar:
+                startActivity(new Intent(this, Emergency.class));
+                this.finish();
+                return true;
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }

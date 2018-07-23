@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main"
-
     tools:context="com.bitwis3.gaine.multitextnogroupPRO.MainActivity">
 
     <android.support.design.widget.TabLayout
@@ -29,38 +28,38 @@
 
         android:gravity="center_horizontal">
         <View
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/oldp"
             android:layout_width="match_parent"
             android:layout_height="2dp"/>
-    <Spinner
+        <Spinner
 
-        android:id="@+id/spinnerinMain"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:minWidth="150dp"
-        />
+            android:id="@+id/spinnerinMain"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:minWidth="150dp"
+            />
         <View
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/oldp"
             android:layout_width="match_parent"
             android:layout_height="2dp"/>
     </LinearLayout>
 
-        <ListView
-            android:layout_below="@id/LL1"
-            android:dividerHeight="2dp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingLeft="2dp"
-            android:paddingRight="2dp"
-            android:paddingTop="2dp"
-android:paddingBottom="2dp"
-            android:id="@+id/listview"
-            android:layout_alignParentBottom="true"
+    <ListView
+        android:layout_below="@id/LL1"
+        android:dividerHeight="2dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:id="@+id/listview"
+        android:layout_alignParentBottom="true"
 
-            />
+        />
 
 
 

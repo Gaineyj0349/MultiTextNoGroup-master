@@ -20,6 +20,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,9 +53,9 @@ public class MainActivity extends AppCompatActivity {
     static final Integer SMS = 0x5;
     static final Integer ACCOUNTS = 0x6;
     ArrayList<String> numbersToSend;
-//    DBHelper helper = null;
+    //    DBHelper helper = null;
     FloatingActionButton fab;
-//    SQLiteDatabase db = null;
+    //    SQLiteDatabase db = null;
     public static boolean returning = false;
     private Uri uriContact;
     private String contactID;
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-       ;
+        ;
         if(getIntent().hasExtra("timed")){
             getSupportActionBar().setTitle("Timed Text Message");
             getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.gradient3));
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 //        db = helper.getWritableDatabase();
         db = Room.databaseBuilder(getApplicationContext(),
                 DBRoom.class, "_database_multi_master")
-                 .fallbackToDestructiveMigration()
+                .fallbackToDestructiveMigration()
                 .allowMainThreadQueries().build();
 
         spinner = (Spinner) findViewById(R.id.spinnerinMain);
@@ -114,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (selectedTab) {
                     case "Select Recipients":
-                        com.bitwis3.gaine.multitextnogroupPRO.CustomListAdapter.setArrayList();
+                        CustomListAdapter.setArrayList();
                         selectedTabint = 1;
                         //  Toast.makeText(MainActivity.this, "cont", Toast.LENGTH_LONG).show();
                         LL1.setVisibility(View.GONE);
@@ -148,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                         loadFolderSpinner();
                         //  Toast.makeText(MainActivity.this, "group", Toast.LENGTH_LONG).show();
                         LL1.setVisibility(View.VISIBLE);
-                        com.bitwis3.gaine.multitextnogroupPRO.CustomListAdapter.setArrayList();
+                        CustomListAdapter.setArrayList();
                         fillListViewFromGroup();
                         break;
 
@@ -298,15 +299,30 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_emergency, menu);
+        return true;
+    }
+
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
 
                 Bungee.slideRight(this);
-                MainActivity.this.finish();
+                this.finish();
 
                 return true;
+
+
+            case R.id.emergencytoolbar:
+                startActivity(new Intent(this, Emergency.class));
+                this.finish();
+                return true;
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -361,42 +377,17 @@ public class MainActivity extends AppCompatActivity {
 
     public void fillListView() {
         lv.setAdapter(null);
-        com.bitwis3.gaine.multitextnogroupPRO.CustomListAdapter.setArrayList();
-        com.bitwis3.gaine.multitextnogroupPRO.CustomListAdapter adapter = new com.bitwis3.gaine.multitextnogroupPRO.CustomListAdapter(MainActivity.this, getContactsList(MainActivity.this));
+        CustomListAdapter.setArrayList();
+        CustomListAdapter adapter = new CustomListAdapter(MainActivity.this, getContactsList(MainActivity.this));
         lv.setAdapter(adapter);
     }
 
-    public static ArrayList<Contact> getContactsList(Context context) {
-        ArrayList<String> numbers = new ArrayList<>();
-        ArrayList<Contact> contacts = new ArrayList<>();
-        Cursor phones = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                null, null, null, null);
-        while (phones.moveToNext()) {
-            String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-            String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            int type = phones.getInt(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
-            Log.i("JOSHtest", "" + type);
-           if(!numbers.contains(phoneNumber)){
-               contacts.add(new Contact(name, phoneNumber, type));
-           }
-            numbers.add(phoneNumber);
-        }
-        phones.close();
-        Collections.sort(contacts, new Comparator<Contact>() {
-            public int compare(Contact v1, Contact v2) {
-                return v1.getName().compareTo(v2.getName());
-            }
-        });
 
-
-
-        return contacts;
-    }
 
     public void buildArrayListFromPositions() {
         namesToSend = new ArrayList<>();
         numbersToSend = new ArrayList<>();
-        ArrayList<Integer> positions = com.bitwis3.gaine.multitextnogroupPRO.CustomListAdapter.getArrayList();
+        ArrayList<Integer> positions = CustomListAdapter.getArrayList();
 
         int size = positions.size();
 
@@ -442,20 +433,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadFolderSpinner() {
-                List<String> list = db.multiDOA().getDistinctGroups();
-                Log.i("JOSHnew", "size: " + list.size());
+        List<String> list = db.multiDOA().getDistinctGroups();
+        Log.i("JOSHnew", "size: " + list.size());
         if(list.size() > 0){
-                adapterForSpinner = new ArrayAdapter<String>(MainActivity.this,
-                        R.layout.spinnerz, list);
+            adapterForSpinner = new ArrayAdapter<String>(MainActivity.this,
+                    R.layout.spinnerz, list);
 
-                adapterForSpinner.setDropDownViewResource(R.layout.spinnerzdrop);
+            adapterForSpinner.setDropDownViewResource(R.layout.spinnerzdrop);
 
-                    spinner.setAdapter(adapterForSpinner);
-                }else{
-                    spinner.setAdapter(null);
-                }
+            spinner.setAdapter(adapterForSpinner);
+        }else{
+            spinner.setAdapter(null);
+        }
 
-            }
+    }
 
 
 
@@ -492,7 +483,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void extraMethod() {
         // buildArrayListFromPositions();
-        com.bitwis3.gaine.multitextnogroupPRO.CustomListAdapter.setArrayList();
+        CustomListAdapter.setArrayList();
 
         Log.d("JOSH", "RESUMECOUNT: " + resumeCount);
 
@@ -502,7 +493,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-//    private void checkForConsent() {
+    //    private void checkForConsent() {
 //        ConsentInformation consentInformation = ConsentInformation.getInstance(MainActivity.this);
     //
     //        ConsentInformation.getInstance(MainActivity.this).addTestDevice("E8F9908FCA6E01002BCD08F42B00E801");
@@ -661,21 +652,21 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //    }
 //
-private void changeTabsFont() {
-    Typeface font = Typeface.createFromAsset(MainActivity.this.getAssets(), "Acme-Regular.ttf");
-    ViewGroup vg = (ViewGroup) tablayout.getChildAt(0);
-    int tabsCount = vg.getChildCount();
-    for (int j = 0; j < tabsCount; j++) {
-        ViewGroup vgTab = (ViewGroup) vg.getChildAt(j);
-        int tabChildsCount = vgTab.getChildCount();
-        for (int i = 0; i < tabChildsCount; i++) {
-            View tabViewChild = vgTab.getChildAt(i);
-            if (tabViewChild instanceof TextView) {
-                ((TextView) tabViewChild).setTypeface(font);
+    private void changeTabsFont() {
+        Typeface font = Typeface.createFromAsset(MainActivity.this.getAssets(), "Acme-Regular.ttf");
+        ViewGroup vg = (ViewGroup) tablayout.getChildAt(0);
+        int tabsCount = vg.getChildCount();
+        for (int j = 0; j < tabsCount; j++) {
+            ViewGroup vgTab = (ViewGroup) vg.getChildAt(j);
+            int tabChildsCount = vgTab.getChildCount();
+            for (int i = 0; i < tabChildsCount; i++) {
+                View tabViewChild = vgTab.getChildAt(i);
+                if (tabViewChild instanceof TextView) {
+                    ((TextView) tabViewChild).setTypeface(font);
+                }
             }
         }
     }
-}
 
     @Override
     public void onBackPressed() {
@@ -690,4 +681,42 @@ private void changeTabsFont() {
         super.onStop();
         MainActivity.this.finish();
     }
+
+
+    public static ArrayList<Contact> getContactsList(Context context) {
+        ArrayList<String> numbers = new ArrayList<>();
+        ArrayList<String> tempNums = new ArrayList<>();
+        ArrayList<Contact> contacts = new ArrayList<>();
+        Cursor phones = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                null, null, null, null);
+        while (phones.moveToNext()) {
+            String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+            String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+            String modNumber = phoneNumber.replaceAll("[^0-9]", "");
+
+            int type = phones.getInt(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+            Log.i("JOSHtest", "" + type);
+            if(!tempNums.contains(modNumber)){
+                contacts.add(new Contact(name, phoneNumber, type));
+            }
+            tempNums.add(modNumber);
+            numbers.add(phoneNumber);
+        }
+        phones.close();
+        try{
+            Collections.sort(contacts, new Comparator<Contact>() {
+                public int compare(Contact v1, Contact v2) {
+                    return v1.getName().compareTo(v2.getName());
+                }
+            });
+        }catch (Exception e){
+
+        }
+
+
+
+        return contacts;
+    }
+
+
 }
