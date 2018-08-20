@@ -338,7 +338,7 @@ public class Main2Activity extends AppCompatActivity {
                                 };
 
                                 AlertDialog.Builder builder = new AlertDialog.Builder(Main2Activity.this);
-                                builder.setMessage("NOTE - Depending on your android device's make,model and OS, the messages may not appear in your native messaging app immediately everytime (this is a limitation of using default messaging app), however they DO send and will eventually appear as outgoing messages.\n\nRoll out Message to: " + getStringOfPeople()).setPositiveButton("Yes", dialogClickListener)
+                                builder.setMessage("NOTE - this is using your default texting service, if you are not on an unlimited texting plan, this could incur charges.\n\nRoll out Message to: " + getStringOfPeople()).setPositiveButton("Yes", dialogClickListener)
                                         .setNegativeButton("No", dialogClickListener).show();
 
 
@@ -405,11 +405,6 @@ public class Main2Activity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Main2Activity.this.finish();
-    }
 
 
     private void showNotificationForOld() {

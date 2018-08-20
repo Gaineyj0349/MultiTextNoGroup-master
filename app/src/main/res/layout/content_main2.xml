@@ -8,12 +8,13 @@
     tools:context="com.bitwis3.gaine.multitextnogroupPRO.Main2Activity"
     tools:showIn="@layout/activity_main2">
     <EditText
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
        android:layout_alignParentTop="true"
         android:id="@+id/editText"
         android:hint="Type Message Here"
-        android:inputType="textMultiLine"
+        android:inputType="textCapSentences"
         android:selectAllOnFocus="false"
 
         android:paddingStart="8dp"
